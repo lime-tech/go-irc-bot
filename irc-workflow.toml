@@ -1,0 +1,6 @@
+nick = "testy"
+server = "127.0.0.1:6667"
+channels = ["#main", "#test"]
+
+[http]
+addr = "127.0.0.1:8080"

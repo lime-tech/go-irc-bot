@@ -1,0 +1,45 @@
+{
+	"ImportPath": "irc-workflow",
+	"GoVersion": "go1.4.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.1.0-21-g056c9bc",
+			"Rev": "056c9bc7be7190eaa7715723883caffa5f8fa3e4"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.2-6-g0f2a495",
+			"Rev": "0f2a4955b11372eec5a4b95d907eaf8379b835d0"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-111-g854c521",
+			"Rev": "854c52192c709766187afe5891a755bc97f82c38"
+		},
+		{
+			"ImportPath": "github.com/fluffle/goirc/client",
+			"Rev": "fdb1c8229d7dd982eeb3240ceaef99617b8ea48d"
+		},
+		{
+			"ImportPath": "github.com/fluffle/goirc/logging",
+			"Rev": "fdb1c8229d7dd982eeb3240ceaef99617b8ea48d"
+		},
+		{
+			"ImportPath": "github.com/fluffle/goirc/state",
+			"Rev": "fdb1c8229d7dd982eeb3240ceaef99617b8ea48d"
+		},
+		{
+			"ImportPath": "github.com/golang/mock/gomock",
+			"Rev": "06883d979f10cc178f2716846215c8cf90f9e363"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "ee1815431e497d3850809578c93ab6705f1a19f7"
+		}
+	]
+}

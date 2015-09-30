@@ -1,0 +1,11 @@
+* TODO
+  - [ ] Authenticated http queries?
+  - [ ] HTTPS support?
+  - [ ] More options to control http server
+  - [ ] Support multiple protocols
+
+* Ideas
+  - Ring cache for each user that have contacted the bot
+    Limits on how many caches stored and how many messages in each cache
+    User should be able to request ther cache
+    and maybe it should request other caches, there should be a flag in config to allow this
