@@ -4,7 +4,7 @@ root="$(git rev-parse --show-toplevel)"
 cd "$root"
 
 if [ -z "$GOPATH" ]; then
-    export GOPATH="$HOME/code/go"
+    export GOPATH="$HOME/go"
     export PATH="$PATH:$GOPATH/bin"
 fi
 
