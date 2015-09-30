@@ -1,8 +1,13 @@
 * TODO
-  - [ ] Authenticated http queries?
-  - [ ] HTTPS support?
-  - [ ] More options to control http server
+  - [ ] Message preprocess function in lua(or other embedded language)
+    This will enable aliases and will give full compatibility with relays
+  - [ ] Authenticated HTTP API
+  - [ ] HTTPS support
+  - [ ] More options to control HTTP server
   - [ ] Support multiple protocols
+    Maybe refactor the code to make intergation with some things like jabber easy
+    (maybe someone from community will PR the module?),
+    IRC is simple and very powerful, not sure I want other
 
 * Ideas
   - Ring cache for each user that have contacted the bot
