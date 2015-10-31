@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"io"
-	"irc-workflow/version"
+	"go-irc-bot/version"
 	"os"
 	"path"
 )

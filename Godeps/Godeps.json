@@ -1,5 +1,5 @@
 {
-	"ImportPath": "irc-workflow",
+	"ImportPath": "go-irc-bot",
 	"GoVersion": "go1.4.2",
 	"Deps": [
 		{

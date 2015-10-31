@@ -1,6 +1,6 @@
-nick = "testy"
+nick = "abot"
 server = "127.0.0.1:6667"
-channels = ["#main", "#test"]
+channels = ["#main"]
 
 [http]
 addr = "127.0.0.1:8080"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"irc-workflow/version"
+	"go-irc-bot/version"
 	"os"
 	"os/signal"
 	"path"

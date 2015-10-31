@@ -6,8 +6,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	irc "github.com/fluffle/goirc/client"
 	state "github.com/fluffle/goirc/state"
-	"irc-workflow/bot"
-	"irc-workflow/config"
+	"go-irc-bot/bot"
+	"go-irc-bot/config"
 	"strings"
 	"time"
 )

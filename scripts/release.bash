@@ -14,14 +14,14 @@ if [ "$1" = "version" ] && [ ! -z "$version" ]; then
     perl -p -i -e "s|<<version>>|$version|" version/version.go
     perl -p -i -e "s|<<rev>>|$(git rev-parse HEAD)|" version/version.go
 
-    mkdir -p irc-workflow-"$version"/src/irc-workflow
+    mkdir -p go-irc-bot-"$version"/src/go-irc-bot
     
     rsync -avzr --delete \
-	  --filter='- irc-workflow-*' \
+	  --filter='- go-irc-bot-*' \
 	  --filter='- .*' \
-	  . irc-workflow-"$version"/src/irc-workflow
+	  . go-irc-bot-"$version"/src/go-irc-bot
     
-    tar czf irc-workflow-"$version".tgz irc-workflow-"$version"
+    tar czf go-irc-bot-"$version".tgz go-irc-bot-"$version"
     git checkout version/version.go
 else
     echo "Usage: $0 version <num>" 1>&2
