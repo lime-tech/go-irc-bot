@@ -65,10 +65,10 @@ MainLoop:
 func Run(args []string) error {
 	app := cli.NewApp()
 	app.Name = path.Base(args[0])
-	app.Usage = "Simple irc workflow bot"
+	app.Usage = "Extendable IRC bot"
 	app.Version = fmt.Sprintf("%s", version)
 	app.Authors = []cli.Author{
-		cli.Author{Name: "bob", Email: ""},
+		cli.Author{Name: "Bob", Email: "bob@localhost"},
 	}
 	app.Flags = rootFlags
 	app.Before = getLogLevel
