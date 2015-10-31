@@ -1,4 +1,6 @@
 *~
-*.tgz
 main
 /build
+go-irc-bot
+go-irc-bot-*/
+go-irc-bot-*.tgz

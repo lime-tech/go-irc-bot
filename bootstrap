@@ -17,3 +17,4 @@ go get $go_get_flags code.google.com/p/rog-go/exp/cmd/godef
 go get $go_get_flags github.com/nsf/gocode
 
 godep restore
+go install

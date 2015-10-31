@@ -4,14 +4,16 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"go-irc-bot/version"
 	"os"
 	"os/signal"
 	"path"
 	"syscall"
 )
 
-var logLevel log.Level
+var (
+	logLevel log.Level
+	version  string
+)
 
 func getLogLevel(c *cli.Context) error {
 	log.SetOutput(os.Stderr)
@@ -64,7 +66,7 @@ func Run(args []string) error {
 	app := cli.NewApp()
 	app.Name = path.Base(args[0])
 	app.Usage = "Simple irc workflow bot"
-	app.Version = fmt.Sprintf("%s #%s", version.Version, version.Commit)
+	app.Version = fmt.Sprintf("%s", version)
 	app.Authors = []cli.Author{
 		cli.Author{Name: "bob", Email: ""},
 	}

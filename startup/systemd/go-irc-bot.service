@@ -1,0 +1,13 @@
+[Unit]
+Description = Extendable IRC bot
+After = syslog.target network.target nss-lookup.target local-fs.target time-sync.target
+
+[Service]
+Type = simple
+User = go-irc-bot
+PIDFile = /run/go-irc-bot/go-irc-bot.pid
+Environment=TZ=UTC
+ExecStart=/usr/bin/go-irc-bot client --config /etc/go-irc-bot/config.toml
+
+[Install]
+WantedBy=multi-user.target
