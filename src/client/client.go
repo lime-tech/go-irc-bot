@@ -7,8 +7,8 @@ import (
 	irc "github.com/fluffle/goirc/client"
 	state "github.com/fluffle/goirc/state"
 	"github.com/flynn-archive/go-shlex"
-	"go-irc-bot/bot"
-	"go-irc-bot/config"
+	"go-irc-bot/src/bot"
+	"go-irc-bot/src/config"
 	"strings"
 	"time"
 )

@@ -21,7 +21,7 @@ var (
 		cli.StringFlag{
 			Name:  "config",
 			Usage: "path to client config file in TOML format",
-			Value: "go-irc-bot.toml",
+			Value: "go-irc-bot/src.toml",
 		},
 	}
 )

@@ -3,8 +3,8 @@ package httpapi
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"go-irc-bot/client"
-	"go-irc-bot/config"
+	"go-irc-bot/src/client"
+	"go-irc-bot/src/config"
 	"net/http"
 	"strings"
 )

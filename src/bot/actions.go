@@ -3,7 +3,7 @@ package bot
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"go-irc-bot/actions/postpone"
+	"go-irc-bot/src/actions/postpone"
 )
 
 func pingAction(c *cli.Context) {

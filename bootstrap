@@ -12,9 +12,9 @@ if [ -z "$GOPATH" ]; then
     echo "WARN Falling back to default GOPATH $GOPATH" 1>&2
 fi
 
-go get $go_get_flags github.com/tools/godep
-go get $go_get_flags code.google.com/p/rog-go/exp/cmd/godef
-go get $go_get_flags github.com/nsf/gocode
+go get github.com/tools/godep
+go get code.google.com/p/rog-go/exp/cmd/godef
+go get github.com/nsf/gocode
 
 godep restore
 go install
