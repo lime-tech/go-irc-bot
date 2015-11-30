@@ -22,6 +22,10 @@ var (
 			Usage: "id of user running the application",
 			Value: "",
 		},
+		cli.BoolFlag{
+			Name:  "silent, s",
+			Usage: "do not produce the noise",
+		},
 	}
 )
 
@@ -39,7 +43,7 @@ func Run(args []string, output io.Writer) error {
 	}
 	app.Writer = output
 	app.Flags = rootFlags
-	app.Commands = commands
+	app.Commands = Commands
 
 	return app.Run(args)
 }

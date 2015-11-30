@@ -14,7 +14,53 @@ const (
 )
 
 var (
-	o orm.Ormer
+	o           orm.Ormer
+	CliCommands = []cli.Command{
+		{
+			Name:      "postpone",
+			ShortName: "pp",
+			Usage:     "Postpone a message for user",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "message, m",
+					Usage: "message text to postpone",
+					Value: "",
+				},
+				cli.StringFlag{
+					Name:  "to, t",
+					Usage: "target user to postpone a message to",
+					Value: "",
+				},
+			},
+			Action: CliPostpone,
+		},
+		{
+			Name:      "postpone-remove",
+			ShortName: "pr",
+			Usage:     "removes postponed message",
+			Flags: []cli.Flag{
+				cli.IntFlag{
+					Name:  "key, k",
+					Usage: "message key",
+					Value: -1,
+				},
+			},
+			Action: CliPostponeRemove,
+		},
+		{
+			Name:      "postpone-list",
+			ShortName: "pl",
+			Usage:     "view postponed message lists",
+			Flags: []cli.Flag{
+				cli.IntFlag{
+					Name:  "page, p",
+					Usage: "page to show",
+					Value: 0,
+				},
+			},
+			Action: CliPostponeList,
+		},
+	}
 )
 
 type Message struct {
@@ -103,7 +149,10 @@ func CliPostponeList(c *cli.Context) {
 		log.Error(err)
 		return
 	} else {
-		c.App.Writer.Write([]byte(fmt.Sprintf("For user %s found %d records\n", user, num)))
+		if num > 0 {
+			c.App.Writer.Write([]byte(fmt.Sprintf("For user %s found %d postponed messages\n", user, num)))
+		}
+
 		for _, v := range *ms {
 			c.App.Writer.Write(
 				[]byte(

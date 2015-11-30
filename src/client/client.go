@@ -53,6 +53,30 @@ var (
 	RESTRICTED_ARGS = []string{"-u", "--u", "-i", "--i"}
 )
 
+func (self *Client) runHooks(k string, hs map[string][]string, line *irc.Line) (string, error) {
+	if hooks, ok := hs[k]; ok {
+		res := ""
+		for _, hook := range hooks {
+			if reply, err := (&Command{
+				Line:   line,
+				Config: self.Config,
+				Shlex:  hook,
+			}).Execute(); err != nil {
+				res = err.Error()
+				return res, nil
+			} else {
+				if len(res) > 0 {
+					res += "\n" + reply
+				} else {
+					res = reply
+				}
+			}
+		}
+		return res, nil
+	}
+	return "", nil
+}
+
 func gotHighlighted(nick string, msg string) (bool, int, int) {
 	if nick == msg {
 		return true, 0, len(msg)
@@ -141,13 +165,13 @@ func (c *Command) isRestrictedArg(arg string) bool {
 
 func (c *Command) FilterArgs(args []string) []string {
 	res := []string{}
-	log.Info(args)
 	for _, arg := range args {
 		if c.isRestrictedArg(arg) {
 			continue
 		}
 		res = append(res, arg)
 	}
+	log.Debugf("Args after filtration %s", strings.Join(res, ":"))
 	return res
 }
 
@@ -238,6 +262,25 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 	}
 }
 
+func (self *Client) OnJoin(conn *irc.Conn, line *irc.Line) {
+	if line.Nick == self.Config.Me.Nick {
+		return
+	}
+	if out, err := self.runHooks(irc.JOIN, bot.Hooks, line); err != nil {
+		log.Error(err)
+		return
+	} else {
+		if len(out) > 0 {
+			(&Message{
+				Kind:    MSG_KIND_CHAN,
+				Nick:    line.Nick,
+				Content: out,
+				Channel: line.Args[0],
+			}).Send(conn)
+		}
+	}
+}
+
 func New(c *config.Config) *Client {
 	clientConfig := &irc.Config{
 		Me: &state.Nick{
@@ -266,6 +309,7 @@ func New(c *config.Config) *Client {
 	}
 
 	conn.HandleFunc(irc.PRIVMSG, client.OnMsg)
+	conn.HandleFunc(irc.JOIN, client.OnJoin)
 	conn.HandleFunc(irc.CONNECTED, func(conn *irc.Conn, line *irc.Line) {
 		for _, channel := range client.Channels {
 			conn.Join(channel)
