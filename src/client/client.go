@@ -272,7 +272,7 @@ func (self *Client) OnJoin(conn *irc.Conn, line *irc.Line) {
 	} else {
 		if len(out) > 0 {
 			(&Message{
-				Kind:    MSG_KIND_CHAN,
+				Kind:    MSG_KIND_PRIV,
 				Nick:    line.Nick,
 				Content: out,
 				Channel: line.Args[0],
