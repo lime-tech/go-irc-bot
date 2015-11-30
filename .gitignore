@@ -4,3 +4,4 @@ main
 go-irc-bot
 go-irc-bot-*/
 go-irc-bot-*.tgz
+*.db
