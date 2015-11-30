@@ -6,6 +6,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	irc "github.com/fluffle/goirc/client"
 	state "github.com/fluffle/goirc/state"
+	"github.com/flynn-archive/go-shlex"
 	"go-irc-bot/bot"
 	"go-irc-bot/config"
 	"strings"
@@ -114,10 +115,12 @@ func (self *Message) Send(conn *irc.Conn) error {
 
 func (self *Client) ExecuteCommand(cmd string) (string, error) {
 	output := new(bytes.Buffer)
-	args := append([]string{self.Config.Me.Nick}, strings.Split(cmd, " ")...)
-
-	err := bot.Run(args, output)
+	args, err := shlex.Split(self.Config.Me.Nick + " " + cmd)
 	if err != nil {
+		return "", err
+	}
+
+	if err := bot.Run(args, output); err != nil {
 		return "", err
 	} else {
 		return output.String(), nil

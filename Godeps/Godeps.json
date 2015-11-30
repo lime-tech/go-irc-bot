@@ -30,6 +30,10 @@
 			"Rev": "fdb1c8229d7dd982eeb3240ceaef99617b8ea48d"
 		},
 		{
+			"ImportPath": "github.com/flynn-archive/go-shlex",
+			"Rev": "3f9db97f856818214da2e1057f8ad84803971cff"
+		},
+		{
 			"ImportPath": "github.com/golang/mock/gomock",
 			"Rev": "06883d979f10cc178f2716846215c8cf90f9e363"
 		},
