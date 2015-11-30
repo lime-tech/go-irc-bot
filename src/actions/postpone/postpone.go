@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/codegangsta/cli"
 	_ "github.com/mattn/go-sqlite3"
+	"os"
 	"time"
 )
 
@@ -76,8 +77,10 @@ func init() {
 	if err := orm.RegisterDataBase("default", "sqlite3", "./postpone.db", 30); err != nil {
 		log.Fatal(err)
 	}
-	if err := orm.RunSyncdb("default", true, true); err != nil {
-		log.Fatal(err)
+	if v, ok := os.LookupEnv("DB_RUN_SYNC"); ok && v == "yes" {
+		if err := orm.RunSyncdb("default", true, true); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	o = orm.NewOrm()

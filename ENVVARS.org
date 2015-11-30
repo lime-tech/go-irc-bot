@@ -1,0 +1,2 @@
+* Environment variables
+  - =DB_RUN_SYNC=yes= runs sync, destroying all databases with data, recreates all of this
