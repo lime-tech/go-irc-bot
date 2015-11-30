@@ -38,8 +38,8 @@ var (
 			Usage:     "removes postponed message",
 			Flags: []cli.Flag{
 				cli.IntFlag{
-					Name:  "id, i",
-					Usage: "message id",
+					Name:  "key, k",
+					Usage: "message key",
 					Value: -1,
 				},
 			},

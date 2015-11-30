@@ -67,7 +67,7 @@ func CliPostpone(c *cli.Context) {
 }
 
 func CliPostponeRemove(c *cli.Context) {
-	if c.Int("id") < 0 {
+	if c.Int("key") < 0 {
 		c.App.Writer.Write(
 			[]byte("--id should be positive integer value"),
 		)
@@ -77,7 +77,7 @@ func CliPostponeRemove(c *cli.Context) {
 	user := c.GlobalString("user")
 	qs := o.QueryTable("message")
 	if num, err := qs.
-		Filter("id", c.Int("id")).
+		Filter("id", c.Int("key")).
 		Filter("to", user).
 		Delete(); err != nil {
 		log.Error(err)

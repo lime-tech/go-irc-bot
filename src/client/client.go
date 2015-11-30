@@ -49,6 +49,10 @@ const (
 	HLIGHT_SEP    = ": "
 )
 
+var (
+	RESTRICTED_ARGS = []string{"-u", "--u", "-i", "--i"}
+)
+
 func gotHighlighted(nick string, msg string) (bool, int, int) {
 	if nick == msg {
 		return true, 0, len(msg)
@@ -126,18 +130,40 @@ func (c *Command) PredefinedParams() []string {
 	}
 }
 
+func (c *Command) isRestrictedArg(arg string) bool {
+	for _, p := range RESTRICTED_ARGS {
+		if strings.HasPrefix(arg, p) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Command) FilterArgs(args []string) []string {
+	res := []string{}
+	log.Info(args)
+	for _, arg := range args {
+		if c.isRestrictedArg(arg) {
+			continue
+		}
+		res = append(res, arg)
+	}
+	return res
+}
+
 func (c *Command) Execute() (string, error) {
 	output := new(bytes.Buffer)
 	args, err := shlex.Split(c.Shlex)
 	if err != nil {
 		return "", err
 	}
+	vargs := append(
+		append([]string{c.Config.Me.Nick}, (c.PredefinedParams())...),
+		c.FilterArgs(args)...,
+	)
 
 	if err := bot.Run(
-		append(
-			append([]string{c.Config.Me.Nick}, (c.PredefinedParams())...),
-			args...,
-		),
+		vargs,
 		output,
 	); err != nil {
 		return "", err
