@@ -9,7 +9,20 @@ import (
 )
 
 var (
-	version string
+	version   string
+	rootFlags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "user, u",
+			Usage:  "user that was run this application",
+			EnvVar: "USER",
+			Value:  "",
+		},
+		cli.StringFlag{
+			Name:  "id, i",
+			Usage: "id of user running the application",
+			Value: "",
+		},
+	}
 )
 
 func Run(args []string, output io.Writer) error {

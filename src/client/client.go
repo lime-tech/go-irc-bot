@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// Tip on long latency networks:
+// Tip on long latency networks(posible implementation, not actual):
 // Measure time between server pings, multiply it by 2
 // Now it is a time of sended messages buffer.
 // If connection is dead you message will be dead
@@ -119,14 +119,27 @@ func (self *Message) Send(conn *irc.Conn) error {
 	return nil
 }
 
+func (c *Command) PredefinedParams() []string {
+	return []string{
+		"--user", c.Line.Nick,
+		"--id", c.Line.Ident,
+	}
+}
+
 func (c *Command) Execute() (string, error) {
 	output := new(bytes.Buffer)
-	args, err := shlex.Split(c.Config.Me.Nick + " " + c.Shlex)
+	args, err := shlex.Split(c.Shlex)
 	if err != nil {
 		return "", err
 	}
 
-	if err := bot.Run(args, output); err != nil {
+	if err := bot.Run(
+		append(
+			append([]string{c.Config.Me.Nick}, (c.PredefinedParams())...),
+			args...,
+		),
+		output,
+	); err != nil {
 		return "", err
 	} else {
 		return output.String(), nil
@@ -180,6 +193,9 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 			reply = err.Error()
 		}
 
+		if len(reply) == 0 {
+			return
+		}
 		err = (&Message{
 			Kind:    kind,
 			Content: reply,
