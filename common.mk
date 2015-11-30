@@ -14,6 +14,10 @@ release:
 	rsync -avzr --delete \
 		--filter='- $(NAME)-*' \
 		--filter='- /$(NAME)' \
+		--filter='- *.db' \
+		--filter='+ /.git/' \
+		--filter='- *~' \
+		--filter='- *.org' \
 		--filter='- .*' \
 		. $(NAME)-"$(VERSION)"/src/$(NAME)
 

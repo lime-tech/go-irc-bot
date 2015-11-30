@@ -1,6 +1,6 @@
 Summary: Extendable IRC bot
 Name: go-irc-bot
-Version: 2015122204.b6bb0f56
+Version: 2015122205.ec4df7a3
 Release: 1
 License: GPLv2+
 Source0: %{name}-%{version}.tgz
@@ -19,7 +19,7 @@ Just small IRC workflow bot, see README.
 export GOPATH="$(pwd)"
 export PATH="$PATH:$(pwd)/bin"
 export root='src/'%{name}
-source "$root"/scripts/bootstrap
+source "$root"/bootstrap
 make %{name}
 
 %post
@@ -48,7 +48,7 @@ exit 0
 rm -rf $RPM_BUILD_ROOT
 
 %install
-install -m0755 -D            src/%{name}/main          $RPM_BUILD_ROOT%{_bindir}/%{name}
+install -m0755 -D            src/%{name}/%{name}       $RPM_BUILD_ROOT%{_bindir}/%{name}
 install -m0600 -D            src/%{name}/config.toml   $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config.toml
 install        -D -p -m 0644 %{SOURCE1}                $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
 install        -D -p -m 0644 %{SOURCE2}                $RPM_BUILD_ROOT%{_tmpfilesdir}/%{name}.conf
