@@ -7,6 +7,7 @@ Type = simple
 User = go-irc-bot
 PIDFile = /run/go-irc-bot/go-irc-bot.pid
 Environment=TZ=UTC
+WorkingDirectory=/var/lib/go-irc-bot
 ExecStart=/usr/bin/go-irc-bot client --config /etc/go-irc-bot/config.toml
 
 [Install]
