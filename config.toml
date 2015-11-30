@@ -1,6 +1,12 @@
-nick = "abot"
-server = "127.0.0.1:6667"
-channels = ["#main"]
+[Clients.local]
+Nick = "abot"
+Server = "127.0.0.1:6667"
+Channels = ["#main"]
 
-[http]
-addr = "127.0.0.1:8080"
+[Clients.local2]
+Nick = "zbot"
+Server = "127.0.0.1:6667"
+Channels = ["#main"]
+
+[Http]
+Addr = "127.0.0.1:8080"

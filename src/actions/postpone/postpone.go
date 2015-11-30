@@ -65,11 +65,13 @@ var (
 )
 
 type Message struct {
-	Id   int       `orm:"auto"`
-	From string    `orm:"size(100)"`
-	To   string    `orm:"size(100)"`
-	Data string    `orm:"size(255)"`
-	Date time.Time ``
+	Id      int       `orm:"auto"`
+	Bucket  string    `orm:"size(100);default(global)"`
+	Channel string    `orm:"size(100)"`
+	From    string    `orm:"size(100)"`
+	To      string    `orm:"size(100)"`
+	Data    string    `orm:"size(255)"`
+	Date    time.Time `orm: "auto_now_add;type(datetime)"`
 }
 
 func init() {
@@ -103,10 +105,12 @@ func CliPostpone(c *cli.Context) {
 		return
 	}
 	m := Message{
-		From: c.GlobalString("user") + "@" + c.GlobalString("id"),
-		To:   to,
-		Data: message,
-		Date: time.Now(),
+		From:    c.GlobalString("user") + "@" + c.GlobalString("id"),
+		Bucket:  c.GlobalString("bucket"),
+		Channel: c.GlobalString("channel"),
+		To:      to,
+		Data:    message,
+		Date:    time.Now(),
 	}
 	if err := Do(m); err != nil {
 		log.Error(err)
@@ -127,6 +131,7 @@ func CliPostponeRemove(c *cli.Context) {
 	qs := o.QueryTable("message")
 	if num, err := qs.
 		Filter("id", c.Int("key")).
+		Filter("bucket", c.GlobalString("bucket")).
 		Filter("to", user).
 		Delete(); err != nil {
 		log.Error(err)
@@ -146,13 +151,14 @@ func CliPostponeList(c *cli.Context) {
 	user := c.GlobalString("user")
 	if num, err := qs.
 		Filter("to", user).
+		Filter("bucket", c.GlobalString("bucket")).
 		Offset(c.Int("page") * LIMIT).
 		Limit(LIMIT).
 		All(ms); err != nil {
 		log.Error(err)
 		return
 	} else {
-		if num > 0 {
+		if !c.GlobalBool("silent") {
 			c.App.Writer.Write([]byte(fmt.Sprintf("For user %s found %d postponed messages\n", user, num)))
 		}
 

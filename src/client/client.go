@@ -8,7 +8,7 @@ import (
 	state "github.com/fluffle/goirc/state"
 	"github.com/flynn-archive/go-shlex"
 	"go-irc-bot/src/bot"
-	"go-irc-bot/src/config"
+	"go-irc-bot/src/helpers"
 	"strings"
 	"time"
 )
@@ -23,22 +23,28 @@ import (
 // send those messages.
 
 type Client struct {
+	Name     string
 	Conn     *irc.Conn
 	Channels []string
-	Config   *irc.Config
+	Config   irc.Config
 }
-
 type Message struct {
 	Kind    int
 	Content string
 	Nick    string
 	Channel string
 }
-
 type Command struct {
-	Line   *irc.Line
-	Config *irc.Config
-	Shlex  string
+	Line    *irc.Line
+	Message *Message
+	Config  irc.Config
+	Shlex   string
+}
+type Config struct {
+	Server         string
+	Nick           string
+	Channels       []string
+	ServerPassword string
 }
 
 const (
@@ -50,18 +56,20 @@ const (
 )
 
 var (
-	RESTRICTED_ARGS = []string{"-u", "--u", "-i", "--i"}
+	RESTRICTED_ARGS = []string{"--user", "--id", "--bucket", "--channel"}
 )
 
-func (self *Client) runHooks(k string, hs map[string][]string, line *irc.Line) (string, error) {
+func (cl *Client) runHooks(k string, hs map[string][]string, line *irc.Line) (string, error) {
 	if hooks, ok := hs[k]; ok {
 		res := ""
 		for _, hook := range hooks {
 			if reply, err := (&Command{
-				Line:   line,
-				Config: self.Config,
-				Shlex:  hook,
+				Line:    line,
+				Message: &Message{},
+				Config:  cl.Config,
+				Shlex:   hook,
 			}).Execute(); err != nil {
+				log.Error(err)
 				res = err.Error()
 				return res, nil
 			} else {
@@ -106,37 +114,37 @@ func gotHighlighted(nick string, msg string) (bool, int, int) {
 	return false, 0, 0
 }
 
-func (self *Message) String() string {
-	switch self.Kind {
+func (cl *Message) String() string {
+	switch cl.Kind {
 	case MSG_KIND_CHAN:
 		prefix := ""
-		if len(self.Nick) > 0 {
-			prefix = self.Nick + HLIGHT_SEP
+		if len(cl.Nick) > 0 {
+			prefix = cl.Nick + HLIGHT_SEP
 		}
-		return prefix + self.Content
+		return prefix + cl.Content
 	case MSG_KIND_PRIV:
-		return self.Content
+		return cl.Content
 	default:
 		return ""
 	}
 }
 
-func (self *Message) Send(conn *irc.Conn) error {
+func (cl *Message) Send(conn *irc.Conn) error {
 	to := ""
-	switch self.Kind {
+	switch cl.Kind {
 	case MSG_KIND_CHAN:
-		to = self.Channel
+		to = cl.Channel
 		// Channels should begin with # and have one or more letter
-		if len(self.Channel) < 2 {
+		if len(cl.Channel) < 2 {
 			return errors.New("Invalid channel name")
 		}
 	case MSG_KIND_PRIV:
-		to = self.Nick
+		to = cl.Nick
 	default:
 		return errors.New("Unsupported message kind")
 	}
 
-	for _, rawStr := range strings.Split(self.String(), "\n") {
+	for _, rawStr := range strings.Split(cl.String(), "\n") {
 		reply := strings.Trim(rawStr, "\n")
 		if len(reply) > 0 {
 			conn.Privmsg(to, reply)
@@ -148,9 +156,15 @@ func (self *Message) Send(conn *irc.Conn) error {
 }
 
 func (c *Command) PredefinedParams() []string {
+	var ch string
+	if c.Message.Kind == MSG_KIND_CHAN {
+		ch = c.Line.Args[0]
+	}
 	return []string{
 		"--user", c.Line.Nick,
 		"--id", c.Line.Ident,
+		"--bucket", c.Config.Server,
+		"--channel", ch,
 	}
 }
 
@@ -171,11 +185,11 @@ func (c *Command) FilterArgs(args []string) []string {
 		}
 		res = append(res, arg)
 	}
-	log.Debugf("Args after filtration %s", strings.Join(res, ":"))
 	return res
 }
 
 func (c *Command) Execute() (string, error) {
+	defer helpers.Unpanic(func(v interface{}) { log.Error(v) })
 	output := new(bytes.Buffer)
 	args, err := shlex.Split(c.Shlex)
 	if err != nil {
@@ -185,6 +199,7 @@ func (c *Command) Execute() (string, error) {
 		append([]string{c.Config.Me.Nick}, (c.PredefinedParams())...),
 		c.FilterArgs(args)...,
 	)
+	log.Debugf("Command vargs %+v", vargs)
 
 	if err := bot.Run(
 		vargs,
@@ -196,7 +211,7 @@ func (c *Command) Execute() (string, error) {
 	}
 }
 
-func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
+func (cl *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 	if len(line.Args) != 2 {
 		log.Error("Something nasty happens, line.Args length is not 2, it is", len(line.Args))
 		return
@@ -204,7 +219,7 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 
 	origin, rawMsg := line.Args[0], line.Args[1]
 	msg := strings.Trim(rawMsg, MSG_TRIM_SET)
-	log.Debug(origin, "->", msg)
+	log.Debugf("%s: %s", origin, msg)
 
 	if len(origin) == 0 {
 		log.Error("Something nasty happenes, got msg with zero length origin!")
@@ -223,7 +238,7 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 
 	if kind != MSG_KIND_NULL {
 		var resMsg string
-		if highlighted, start, end := gotHighlighted(self.Config.Me.Nick, msg); highlighted {
+		if highlighted, start, end := gotHighlighted(cl.Config.Me.Nick, msg); highlighted {
 			resMsg = msg[:start] + " " + msg[end:]
 		} else {
 			if kind == MSG_KIND_CHAN {
@@ -234,8 +249,14 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 		}
 
 		reply, err := (&Command{
-			Line:   line,
-			Config: self.Config,
+			Line: line,
+			Message: &Message{
+				Kind:    kind,
+				Content: rawMsg,
+				Nick:    line.Nick,
+				Channel: origin,
+			},
+			Config: cl.Config,
 			Shlex:  strings.Trim(resMsg, MSG_TRIM_SET),
 		}).Execute()
 		if err != nil {
@@ -262,11 +283,11 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 	}
 }
 
-func (self *Client) OnJoin(conn *irc.Conn, line *irc.Line) {
-	if line.Nick == self.Config.Me.Nick {
+func (cl *Client) OnJoin(conn *irc.Conn, line *irc.Line) {
+	if line.Nick == cl.Config.Me.Nick {
 		return
 	}
-	if out, err := self.runHooks(irc.JOIN, bot.Hooks, line); err != nil {
+	if out, err := cl.runHooks(irc.JOIN, bot.Hooks, line); err != nil {
 		log.Error(err)
 		return
 	} else {
@@ -281,8 +302,8 @@ func (self *Client) OnJoin(conn *irc.Conn, line *irc.Line) {
 	}
 }
 
-func New(c *config.Config) *Client {
-	clientConfig := &irc.Config{
+func New(name string, c *Config) *Client {
+	clientConfig := irc.Config{
 		Me: &state.Nick{
 			Nick:  c.Nick,
 			Ident: c.Nick,
@@ -301,8 +322,9 @@ func New(c *config.Config) *Client {
 		Flood:       true,
 	}
 
-	conn := irc.Client(clientConfig)
+	conn := irc.Client(&clientConfig)
 	client := &Client{
+		Name:     name,
 		Conn:     conn,
 		Channels: c.Channels,
 		Config:   clientConfig,
@@ -316,5 +338,6 @@ func New(c *config.Config) *Client {
 		}
 	})
 
+	// FIXME: there is a strange behaviour with client, it have no config
 	return client
 }

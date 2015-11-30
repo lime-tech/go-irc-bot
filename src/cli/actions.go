@@ -3,54 +3,31 @@ package cli
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	irc "github.com/fluffle/goirc/client"
-	"go-irc-bot/src/client"
+	"go-irc-bot/src/app"
 	"go-irc-bot/src/config"
 	"go-irc-bot/src/httpapi"
 	"net/http"
 	"os"
-	"time"
 )
 
-func clientAction(c *cli.Context) {
-	cfg, err := config.FromFile(c.String("config"))
+func clientAction(cx *cli.Context) {
+	c, err := config.FromFile(cx.String("config"))
 	if err != nil {
 		log.Error(err)
 		defer os.Exit(1)
 		return
 	}
-
-	log.Debugf("Running client with config %+v", cfg)
-
-	cClient := client.New(cfg)
-	conn := cClient.Conn
+	log.Debugf("Running client with config %+v", c)
 
 	quit := make(chan bool)
-	//incomming := make(chan *client.Message)
+
+	clients := app.RunClients(c)
 	go func() {
-		for {
-			reconnect := make(chan bool)
-			conn.HandleFunc(irc.DISCONNECTED, func(_ *irc.Conn, _ *irc.Line) {
-				reconnect <- true
-			})
-
-			if err := conn.Connect(); err != nil {
-				log.Error(err)
-				go func() { reconnect <- true }()
-			} else {
-				log.Infof("Connected to %s", cfg.Server)
-			}
-
-			time.Sleep(2 * time.Second)
-			<-reconnect
+		for n, client := range clients {
+			router := httpapi.NewRouter(c.Http, client)
+			http.Handle("/"+n, router)
 		}
-		panic("Unreachable")
-	}()
-
-	go func() {
-		router := httpapi.NewRouter(cfg.Http, cClient)
-		http.Handle("/", router)
-		err := http.ListenAndServe(cfg.Http.Addr, nil)
+		err := http.ListenAndServe(c.Http.Addr, nil)
 		if err != nil {
 			log.Error(err)
 			defer os.Exit(1)

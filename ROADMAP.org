@@ -1,4 +1,5 @@
 * TODO
+  - [ ] Fix client.go
   - [ ] Message preprocess function in lua(or other embedded language)
     This will enable aliases and will give full compatibility with relays
   - [ ] Authenticated HTTP API

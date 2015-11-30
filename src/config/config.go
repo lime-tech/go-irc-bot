@@ -2,19 +2,16 @@ package config
 
 import (
 	"github.com/BurntSushi/toml"
+	"go-irc-bot/src/client"
 )
 
+type Config struct {
+	Clients map[string]*client.Config
+	Http    *HttpApi
+}
 type HttpApi struct {
 	Addr        string
 	MaxPostSize int64
-}
-
-type Config struct {
-	Server         string
-	Nick           string
-	Channels       []string
-	ServerPassword string
-	Http           *HttpApi
 }
 
 func FromFile(path string) (*Config, error) {

@@ -12,14 +12,24 @@ var (
 	version   string
 	rootFlags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "user, u",
+			Name:   "user",
 			Usage:  "user that was run this application",
 			EnvVar: "USER",
 			Value:  "",
 		},
 		cli.StringFlag{
-			Name:  "id, i",
-			Usage: "id of user running the application",
+			Name:  "id",
+			Usage: "id of user requesting the action",
+			Value: "",
+		},
+		cli.StringFlag{
+			Name:  "bucket",
+			Usage: "storage namespace identifier",
+			Value: "global",
+		},
+		cli.StringFlag{
+			Name:  "channel",
+			Usage: "source channel identifier in IRC style - #example",
 			Value: "",
 		},
 		cli.BoolFlag{
