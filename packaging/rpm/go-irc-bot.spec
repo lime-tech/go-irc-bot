@@ -1,6 +1,6 @@
 Summary: Extendable IRC bot
 Name: go-irc-bot
-Version: 2015122205.f0aae3ef
+Version: 2015122205.c26735a7
 Release: 1
 License: GPLv2+
 Source0: %{name}-%{version}.tgz
