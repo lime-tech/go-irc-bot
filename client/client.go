@@ -35,6 +35,12 @@ type Message struct {
 	Channel string
 }
 
+type Command struct {
+	Line   *irc.Line
+	Config *irc.Config
+	Shlex  string
+}
+
 const (
 	MSG_KIND_NULL = iota
 	MSG_KIND_CHAN = iota
@@ -99,7 +105,7 @@ func (self *Message) Send(conn *irc.Conn) error {
 	case MSG_KIND_PRIV:
 		to = self.Nick
 	default:
-		return errors.New("Usuported message kind")
+		return errors.New("Unsupported message kind")
 	}
 
 	for _, rawStr := range strings.Split(self.String(), "\n") {
@@ -113,9 +119,9 @@ func (self *Message) Send(conn *irc.Conn) error {
 	return nil
 }
 
-func (self *Client) ExecuteCommand(cmd string) (string, error) {
+func (c *Command) Execute() (string, error) {
 	output := new(bytes.Buffer)
-	args, err := shlex.Split(self.Config.Me.Nick + " " + cmd)
+	args, err := shlex.Split(c.Config.Me.Nick + " " + c.Shlex)
 	if err != nil {
 		return "", err
 	}
@@ -164,7 +170,11 @@ func (self *Client) OnMsg(conn *irc.Conn, line *irc.Line) {
 			resMsg = msg
 		}
 
-		reply, err := self.ExecuteCommand(strings.Trim(resMsg, MSG_TRIM_SET))
+		reply, err := (&Command{
+			Line:   line,
+			Config: self.Config,
+			Shlex:  strings.Trim(resMsg, MSG_TRIM_SET),
+		}).Execute()
 		if err != nil {
 			log.Error(err)
 			reply = err.Error()

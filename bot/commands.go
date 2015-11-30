@@ -9,8 +9,15 @@ var (
 		{
 			Name:      "ping",
 			ShortName: "p",
-			Usage:     "Test ping sction",
+			Usage:     "Test ping command",
 			Action:    pingAction,
+		},
+		{
+			Name:      "postpone",
+			ShortName: "pp",
+			Usage:     "Postpone a message for user",
+			Flags:     postponeFlags,
+			Action:    postponeAction,
 		},
 	}
 )
